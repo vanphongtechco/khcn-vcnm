@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Phòng KHCN – Viện Cơ khí Năng lượng và Mỏ</title>
+<style>
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0f1b2a;font:15px/1.5 system-ui,Segoe UI,Arial,sans-serif;color:#1d2733}
+.b{background:#fff;border-radius:14px;padding:28px 26px;width:min(380px,92vw);box-shadow:0 10px 40px rgba(0,0,0,.35)}
+.h{display:flex;gap:12px;align-items:center;margin-bottom:18px}.h img{width:52px;height:52px;border-radius:50%}
+.h b{display:block;font-size:16px}.h span{font-size:12.5px;color:#1f8a4c;font-weight:700;letter-spacing:.5px}
+label{display:block;font-size:13px;margin:10px 0 4px;color:#4b5563}input{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #cfd6df;border-radius:8px;font-size:15px}
+button{margin-top:16px;width:100%;padding:11px;border:0;border-radius:8px;background:#1f8a4c;color:#fff;font-size:15px;font-weight:700;cursor:pointer}button:disabled{opacity:.6}
+#m{margin-top:10px;font-size:13.5px;color:#c0392b;min-height:20px}.g{margin-top:14px;font-size:12px;color:#6b7280;text-align:center}
+</style></head><body>
+<form class="b" id="f" autocomplete="on">
+ <div class="h"><img src="logo-vien.webp" alt=""><div><b>VIỆN CKNL&amp;M</b><span>PHÒNG KHCN · CỔNG HỒ SƠ</span></div></div>
+ <label for="u">Tên đăng nhập</label><input id="u" autocomplete="username" required>
+ <label for="p">Mật khẩu</label><input id="p" type="password" autocomplete="current-password" required>
+ <button id="bt">Đăng nhập</button><div id="m"></div>
+ <div class="g">Hệ thống nội bộ – chỉ dành cho tài khoản được Phòng KHCN cấp.</div>
+</form>
+<script>
+(function(){try{var L=window.localStorage,S=window.sessionStorage,P=Storage.prototype;if(P.__khcn)return;var g=P.getItem,s=P.setItem,r=P.removeItem;Object.keys(L).forEach(function(k){if(/^khcn_/.test(k))r.call(L,k)});P.getItem=function(k){return(this===L&&/^khcn_/.test(k))?g.call(S,k):g.call(this,k)};P.setItem=function(k,v){return(this===L&&/^khcn_/.test(k))?s.call(S,k,v):s.call(this,k,v)};P.removeItem=function(k){return(this===L&&/^khcn_/.test(k))?r.call(S,k):r.call(this,k)};P.__khcn=1}catch(e){}})();
+(function(){
+ var API='https://script.google.com/macros/s/AKfycbzTScQRpBPNUavXsk4ErBhrWtbG5ML-ECice5qlJL_fXH-bSMi8wYp_PaKHSu9xTQRz/exec';var el=function(i){return document.getElementById(i)};
+ function msg(t){el('m').textContent=t||''}
+ async function hpw(u,p){try{var d=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('khcn|'+u+'|'+p));return Array.from(new Uint8Array(d)).map(function(b){return b.toString(16).padStart(2,'0')}).join('')}catch(e){return 'x'+btoa(unescape(encodeURIComponent(u+'|'+p)))}}
+ function tb(){var a=navigator.userAgent||'';var os=/Windows/.test(a)?'Windows':/Android/.test(a)?'Android':/iPhone|iPad/.test(a)?'iPhone/iPad':/Mac OS/.test(a)?'Mac':/Linux/.test(a)?'Linux':'Khác';var br=/Edg\//.test(a)?'Edge':/OPR\//.test(a)?'Opera':/CocCoc/.test(a)?'Cốc Cốc':/Chrome\//.test(a)?'Chrome':/Firefox\//.test(a)?'Firefox':/Safari\//.test(a)?'Safari':'trình duyệt khác';return (/Mobi/.test(a)?'điện thoại ':'máy tính ')+os+', '+br}
+ function post(o){return fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)}).then(function(r){return r.json()})}
+ function xoa(){try{Object.keys(localStorage).filter(function(k){return /^khcn_/.test(k)}).forEach(function(k){localStorage.removeItem(k)})}catch(e){}}
+ async function nap(wtk,boot){msg('Đang mở cổng hồ sơ…');var r=await post({action:'app',wtk:wtk});
+  if(!r||!r.ok||!r.html){if(r&&r.canDN){xoa()}msg((r&&r.err)||'Không mở được cổng hồ sơ');el('bt').disabled=false;return false}
+  window.__BOOT=boot||{};document.open();document.write(r.html);document.close();return true}
+ var w=null;try{w=JSON.parse(localStorage.getItem('khcn_wtk')||'null')}catch(e){}
+ if(w&&w.tk&&w.han>Date.now()){el('bt').disabled=true;nap(w.tk,{u:w.u}).catch(function(){el('bt').disabled=false;msg('Không kết nối được máy chủ')})}
+ else{xoa()}
+ el('f').onsubmit=async function(ev){ev.preventDefault();var u=el('u').value.trim().toLowerCase(),p=el('p').value;if(!u||!p)return;el('bt').disabled=true;msg('Đang đăng nhập…');
+  try{var h=await hpw(u,p);var r=await post({action:'tkLogin',u:u,h:h,tb:tb()});
+   if(!r||!r.ok||!r.wtk){msg(r&&r.err?(/Sai mật khẩu/.test(r.err)?'Sai mật khẩu.':r.err):'Không đăng nhập được');el('bt').disabled=false;return}
+   localStorage.setItem('khcn_wtk',JSON.stringify({u:u,tk:r.wtk,han:Date.now()+6*3600e3}));localStorage.setItem('khcn_user',u);el('p').value='';
+   await nap(r.wtk,{u:u,h:h,r:r})}catch(e){msg('Không kết nối được máy chủ');el('bt').disabled=false}};
+})();
+</script></body></html>
